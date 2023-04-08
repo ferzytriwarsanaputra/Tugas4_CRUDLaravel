@@ -67,6 +67,7 @@
 
                             
                             <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('login') }}" class="btn btn-success">Login</a>
                           </form>
                     </div>
                 </div>

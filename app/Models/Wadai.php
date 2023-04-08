@@ -9,7 +9,7 @@ class Wadai extends Model
 {
     use HasFactory;
 
-    protected $table = 'pengunjung';
+    protected $table = 'wadai';
 
-    protected $fillable = ['nama', 'harga',];
+    protected $fillable = ['nama', 'harga', 'gambar'];
 }

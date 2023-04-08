@@ -2,17 +2,31 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
-
+use App\Models\Wadai;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('dashboard');
+        $search = $request->query('search');
+
+        if(!empty($search)){
+            $dataWadai = wadai::Where('wadai.id','like','%' . $search . '%')
+            ->orWhere('wadai.nama', 'like', '%'. $search . '%')
+            ->paginate(6)->onEachSide(2)->fragment('std');
+        } else {
+            $dataWadai = wadai::paginate(6)->onEachSide(2)->fragment('std');
+        }
+
+        return view('dashboard', [
+            'wadai' => $dataWadai,
+            'search' => $search
+        ]);
     }
 
     /**
@@ -62,6 +76,7 @@ class DashboardController extends Controller
     {
         //
     }
+
     public function showDataPengguna()
     {
         $data['users'] = User::all();

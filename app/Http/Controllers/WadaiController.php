@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
-
+use App\Models\Wadai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,10 +11,22 @@ class WadaiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['wadai'] = DB::table('wadai')->get();
-        return view('wadai', $data);        
+        $search = $request->query('search');
+
+        if(!empty($search)){
+            $dataWadai = Wadai::Where('wadai.id','like','%' . $search . '%')
+            ->orWhere('wadai.nama', 'like', '%'. $search . '%')
+            ->paginate(6)->onEachSide(2)->fragment('std');
+        } else {
+            $dataWadai = Wadai::paginate(6)->onEachSide(2)->fragment('std');
+        }
+
+        return view('wadai', [
+            'wadai' => $dataWadai,
+            'search' => $search
+        ]);
     }
 
     /**
@@ -30,14 +42,16 @@ class WadaiController extends Controller
      */
     public function store(Request $request)
     {
-        $namaInput = $request->input('namaInput');
-        $hargaInput = $request->input('hargaInput');
-        $gambarInput = $request->file('image')->store('post-image');
+        $validator = $request->validate([
+            'namaInput' => 'required|max:200',
+            'hargaInput' => 'required|numeric',
+            'image' => 'required|image|file|max:1024',
+        ]);
 
         $query = DB::table('wadai')->insert([
-            'nama' => $namaInput,
-            'harga' => $hargaInput,
-            'gambar' => $gambarInput,
+            'nama' => $request->input('namaInput'),
+            'harga' => $request->input('hargaInput'),
+            'gambar' => $request->file('image')->store('post-image'),
         ]);
 
         if ($query) {
@@ -70,14 +84,16 @@ class WadaiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $namaInput = $request->input('namaInput');
-        $hargaInput = $request->input('hargaInput');
-        // $prodiInput = $request->input('prodiInput');
+        $validator = $request->validate([
+            'namaInput' => 'required|max:200',
+            'hargaInput' => 'required|numeric',
+            'image' => 'image|file|max:1024',
+        ]);
 
         $query = DB::table('wadai')->where('id', $id)->update([
-            'nama' => $namaInput,
-            'harga' => $hargaInput,
-            // 'prodi' => $prodiInput
+            'nama' => $request->input('namaInput'),
+            'harga' => $request->input('hargaInput'),
+            'gambar' => $request->file('image')->store('post-image'),
         ]);
 
         if ($query) {

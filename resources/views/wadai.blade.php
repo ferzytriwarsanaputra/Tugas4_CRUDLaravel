@@ -20,6 +20,15 @@
 
     <a href="{{ route('wadai.create') }}" class="btn btn-success">Tambah Data</a>
 
+    <form method="GET">
+        <div class="row mb-3">
+            <label for="search" class="col-sm-2 col-form-label">Cari Data</label>
+            <div class="mb-10">
+                <input style="width: 99%;" type="text" class="form-control form-control-sm" value="{{ $search }}" placeholder="Cari Disini" name="search" autofocus>
+            </div>
+        </div>
+    </form>
+
     <table class="table">
         <thead>
             <tr>
@@ -32,7 +41,7 @@
         </thead>
         <tbody>
             @php
-                $no = 1;
+                $no = 1 + (($wadai->currentPage() - 1) * $wadai->perPage());
             @endphp
 
             @foreach ($wadai as $item)
@@ -40,7 +49,11 @@
                 <th scope="row">{{ $no }}</th>
                 <td>{{ $item->nama }}</td>
                 <td>{{ $item->harga }}</td>
+                @if($item->gambar)
                 <td><img src="{{ asset('storage/'. $item->gambar) }}" alt="{{ $item->nama }}" style="max-height: 100px;"></td>
+                @else
+                <td><img src="https://i.pinimg.com/736x/d0/17/cf/d017cf0fefc93e2a39f820a915c96322.jpg" style="max-height: 100px;"></td>
+                @endif
                 <td>
                     <a href="{{ route('wadai.edit', $item->id) }}"  class="btn btn-primary">Edit</a>
                     <form action="{{ route('wadai.destroy',$item->id) }}" method="POST" class="d-inline">
@@ -57,6 +70,7 @@
             @endforeach
         </tbody>
     </table>
+    {!! $wadai->appends(Request::except('page'))->render() !!}
     @endsection
 </body>
 </html>
