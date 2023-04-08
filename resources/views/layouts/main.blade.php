@@ -9,7 +9,9 @@
   <body>
     @include('partials.navbar')
     <div class="row justify-content-center">
+      @can('admin')
       @include('partials.sidebar')
+      @endcan
       <div class="container mt-4 col">
           @yield('container')
       </div>
